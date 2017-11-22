@@ -355,19 +355,36 @@ class Linkedin:
                     comments = []
                     # To be worked in the next iteration
                     
-                    # if len(article.find_elements_by_xpath(".//button[@data-control-name='comments_count']")) > 0:
-                    #     comment_button = wait.until(lambda driver:article.find_element_by_xpath(".//button[@data-control-name='comments_count']"))
-                    #     action_comments = ActionChains(driver)
-                    #     action_comments.move_to_element(comment_button).click().perform()
-                    #     time.sleep(2)
-                    #     comments_divs = article.find_elements_by_xpath(".//article")
-                    #     print(comments_divs)
+                    if len(article.find_elements_by_xpath(".//button[@data-control-name='more_comments']")) > 0:
+                        comment_button = wait.until(lambda driver:article.find_element_by_xpath(".//button[@data-control-name='more_comments']"))
+                        action_comments = ActionChains(driver)
+                        action_comments.move_to_element(comment_button).click().perform()
+                        time.sleep(2)
+                        comments_divs = article.find_elements_by_xpath(".//article")
+                        print(comments_divs)
                         
-                    #     for comment in comments_divs:
-                    #         comments.append(comment.text)
+                        print(len(comments_divs))
+            
+                        for div in comments_divs:
+                            time.sleep(3)    
+                            commenter_url_element = div.find_element_by_xpath(".//div[2]/a[2]")
+                            commenter_url = commenter_url_element.get_attribute("href")
+                            commenter = commenter_url_element.text
+                            comment_element = div.find_element_by_xpath(".//p[@dir='ltr']")
+                            comment_text = comment_element.text
 
-                    #     article_i['comments'] = comments
-                    #     print(comments)
+
+                            i_comment = {'commenter': commenter, 'commenter_url': commenter_url, 'comment_text': comment_text}
+                            comments.append(i_comment)
+
+                        for i in comments:
+                            print(i['commenter'], i['commenter_url'], i['comment_text'])
+
+                        print("\n")
+                        print(len(comments))
+
+                        article_i['comments'] = comments
+                        print(comments)
 
                     articles_list.append(article_i)
 
@@ -550,14 +567,14 @@ def main():
             'Mahima Damani': 'https://www.linkedin.com/in/mahima-damani/',
             }
         # Try it with test_urls
-        test_urls = list(profile_urls.values())
-        test_names =list(profile_urls.keys())
-        test_name = test_names[2]
-        test_url = test_urls[2]
-        linkedin = Linkedin()
-        linkedin.login()
-        linkedin.gotoProfile(test_url)
-        overview = linkedin.getOverview()
+    test_urls = list(profile_urls.values())
+    test_names =list(profile_urls.keys())
+    test_name = test_names[2]
+    test_url = test_urls[2]
+    linkedin = Linkedin()
+    linkedin.login()
+    linkedin.gotoProfile(test_url)
+    posts = linkedin.getPosts()
         #Extracting overview details using regex and create a dictionary to push into a pandas dataframe
         #regex = r"\n"
         #matches = re.finditer(regex,overview[0])

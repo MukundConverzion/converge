@@ -89,7 +89,7 @@ class Linkedin:
         driver = self.driver
         
         # for i in urls:
-        driver.get(urls[0])
+        driver.get(urls[3])
         driver.implicitly_wait(8)
         time.sleep(4)
 
@@ -102,28 +102,37 @@ class Linkedin:
             if len(driver.find_elements_by_xpath(".//button[@data-control-name='more_comments']")) > 0:
                 print("Yes..")
                 comment_button = WebDriverWait(driver,5).until(lambda driver:driver.find_element_by_xpath(".//button[@data-control-name='more_comments']"))
-                print(comment_button)
+                # print(comment_button)
 
                 action_comments = ActionChains(driver)
                 action_comments.move_to_element(comment_button).click(comment_button).perform()
-                time.sleep(3)
+                time.sleep(5)
                 body.send_keys(Keys.PAGE_DOWN)
                 break
 
         comments_div = driver.find_element_by_class_name("feed-base-comments-list")
+        # print(comments_div.text)
         comments_divs = comments_div.find_elements_by_xpath(".//article")
-        print(comments_divs)
+        print(len(comments_divs))
             
         for div in comments_divs:
-            
-            commenter_url_element = div.find_element_by_xpath("//div[2]/a[2]")
-            commenter_url = commenter_url_element.get_attribute('href')
+            time.sleep(3)    
+            commenter_url_element = div.find_element_by_xpath(".//div[2]/a[2]")
+            commenter_url = commenter_url_element.get_attribute("href")
             commenter = commenter_url_element.text
-            comment_text = div.find_element_by_xpath("//div[@class='feed-base-comment-item-content-body']").text
+            comment_element = div.find_element_by_xpath(".//p[@dir='ltr']")
+            comment_text = comment_element.text
+
+
             i_comment = {'commenter': commenter, 'commenter_url': commenter_url, 'comment_text': comment_text}
             comments.append(i_comment)
 
-        print(comments)
+        for i in comments:
+        	print(i['commenter'], i['commenter_url'], i['comment_text'])
+
+        print("\n")
+        print(len(comments))
+        return comments
             
     def quitDriver(self):
         driver = self.driver
