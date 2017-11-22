@@ -40,8 +40,8 @@ class Linkedin:
         # options.add_argument('user-data-dir=/home/dipes/.config/google-chrome/Profile')
         self.driver = webdriver.Chrome()
         self.driver.maximize_window()
-        self.email = ''
-        self.password = ''
+        self.email = 'pandey.dipesh50@gmail.com'
+        self.password = 'tatera2013'
 
 
     def login(self):
@@ -88,6 +88,59 @@ class Linkedin:
     def getComments(self):
         driver = self.driver
         
+        comments_all = {}
+        for i in urls:
+
+            driver.get(i)
+            time.sleep(4)
+
+            body = driver.find_element_by_tag_name('body')
+            comments = []
+            while True:
+                print("Scrolling..")
+                body.send_keys(Keys.PAGE_DOWN)
+                time.sleep(2)
+                if len(driver.find_elements_by_xpath(".//button[@data-control-name='more_comments']")) > 0:
+                    print("Yes..")
+                    comment_button = WebDriverWait(driver,5).until(lambda driver:driver.find_element_by_xpath(".//button[@data-control-name='more_comments']"))
+                    # print(comment_button)
+
+                    action_comments = ActionChains(driver)
+                    action_comments.move_to_element(comment_button).click(comment_button).perform()
+                    time.sleep(5)
+                    body.send_keys(Keys.PAGE_DOWN)
+                    break
+
+            self.scrollToBottom()
+            comments_div = driver.find_element_by_class_name("feed-base-comments-list")
+            # print(comments_div.text)
+            comments_divs = comments_div.find_elements_by_xpath(".//article")
+            print(len(comments_divs))
+            driver.implicitly_wait(10)
+            for div in comments_divs:
+                if len(div.find_elements_by_xpath(".//p[@dir='ltr']")) > 0:
+                    comment_element = div.find_element_by_xpath(".//p[@dir='ltr']")
+                    comment_text = comment_element.text
+                    print(comment_text)
+                    commenter_url_element = div.find_element_by_xpath(".//a[@data-control-name='comment_actor']")
+                    commenter_url = commenter_url_element.get_attribute("href")
+                    commenter = commenter_url_element.text
+                    
+                i_comment = {'commenter': commenter, 'commenter_url': commenter_url, 'comment_text': comment_text}
+                comments.append(i_comment)
+
+
+            comments_all[i] = comments
+
+        print("\n")
+        print(len(comments))
+        return comments_all
+    
+
+
+    def getLikes(self):
+        driver = self.driver
+        
         # for i in urls:
         driver.get(urls[3])
         driver.implicitly_wait(8)
@@ -99,41 +152,63 @@ class Linkedin:
             print("Scrolling..")
             body.send_keys(Keys.PAGE_DOWN)
             time.sleep(2)
-            if len(driver.find_elements_by_xpath(".//button[@data-control-name='more_comments']")) > 0:
+            if len(driver.find_elements_by_xpath(".//button[@data-control-name='likes']")) > 0:
                 print("Yes..")
-                comment_button = WebDriverWait(driver,5).until(lambda driver:driver.find_element_by_xpath(".//button[@data-control-name='more_comments']"))
-                # print(comment_button)
-
-                action_comments = ActionChains(driver)
-                action_comments.move_to_element(comment_button).click(comment_button).perform()
-                time.sleep(5)
-                body.send_keys(Keys.PAGE_DOWN)
                 break
 
-        comments_div = driver.find_element_by_class_name("feed-base-comments-list")
-        # print(comments_div.text)
-        comments_divs = comments_div.find_elements_by_xpath(".//article")
-        print(len(comments_divs))
+        time.sleep(3)
+        driver.find_element_by_xpath(".//button[@data-control-name='likes']").click()
+
+        # iframe = driver.find_elements_by_tag_name('iframe')[0]
+        # driver.switch_to_frame(iframe)
+        # likers = []
+        # time.sleep(3)
+        # while True:
+        #     try:
+        #         print(driver.window_handles)
+        #         actor_elements = driver.find_elements_by_xpath("//ul[@class='actor-list']/li")
+        #         print("abc",actor_elements)
+
+        #         print([i.text for i in actor_elements])
+        #         break
+        #     except Exception as e:
+        #         print(e)
+
+        try:
+            time.sleep(5)
+            alert = driver.switch_to_alert()
+            alert.accept()
+            print("alert accepted")
+            actor_elements = driver.find_elements_by_xpath("//ul[@class='actor-list']/li")
+            print("abc",actor_elements)
+
+            print([i.text for i in actor_elements])
+
+        except Exception as e:
+            print(e)
             
-        for div in comments_divs:
-            time.sleep(3)    
-            commenter_url_element = div.find_element_by_xpath(".//div[2]/a[2]")
-            commenter_url = commenter_url_element.get_attribute("href")
-            commenter = commenter_url_element.text
-            comment_element = div.find_element_by_xpath(".//p[@dir='ltr']")
-            comment_text = comment_element.text
+        driver.switch_to_default_content()
 
 
-            i_comment = {'commenter': commenter, 'commenter_url': commenter_url, 'comment_text': comment_text}
-            comments.append(i_comment)
+    def getShares(self):
+        driver = self.driver
 
-        for i in comments:
-        	print(i['commenter'], i['commenter_url'], i['comment_text'])
+        all_shares = {}
+        for i in urls:
+            driver.get(i)
+            time.sleep(5)
+            try:
+                shares = driver.find_element_by_xpath("//ul[@class='reader-social-bar__items']/li[2]/span").text
+            except Exception as e:
+                print(e)
+            else:
+                all_shares[i] = shares
 
-        print("\n")
-        print(len(comments))
-        return comments
-            
+        print(all_shares)
+        return all_shares
+
+
+
     def quitDriver(self):
         driver = self.driver
         driver.quit()
@@ -141,6 +216,7 @@ class Linkedin:
 
 article = Linkedin()
 article.login()
-article.getComments()
+comments = article.getComments()
+shares = article.getShares()
 # article.quitDriver()
 
