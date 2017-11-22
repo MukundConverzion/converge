@@ -35,8 +35,8 @@ class Linkedin:
         # options.add_argument('user-data-dir=/home/dipes/.config/google-chrome/Profile')
         self.driver = webdriver.Chrome()
         self.driver.maximize_window()
-        self.email = ''
-        self.password = ''
+        self.email = 'pandey.dipesh50@gmail.com'
+        self.password = 'tatera2013'
 
 
 
@@ -311,7 +311,7 @@ class Linkedin:
         driver = self.driver
         # Scroll to bottom to load the page fully
         driver.get(driver.current_url+"detail/recent-activity/shares/")
-        self.scrollToBottom()
+        # self.scrollToBottom()
         time.sleep(2)
         
         try: 
@@ -326,7 +326,7 @@ class Linkedin:
 
                 articles_list = []
 
-                for article in articles:
+                for article in articles[:2]:
                     article_i = {}
                     # Extract all details of the article
                     if len(article.find_elements_by_xpath(".//time")) > 0:
@@ -350,16 +350,26 @@ class Linkedin:
                     article_i['like'] = n_likes
 
                     time.sleep(2)
-                    wait = WebDriverWait(driver, 2)
+                    wait = WebDriverWait(driver, 6)
 
                     comments = []
                     # To be worked in the next iteration
                     
-                    if len(article.find_elements_by_xpath(".//button[@data-control-name='more_comments']")) > 0:
-                        comment_button = wait.until(lambda driver:article.find_element_by_xpath(".//button[@data-control-name='more_comments']"))
+                    if len(article.find_elements_by_xpath(".//button[@data-control-name='comments_count']")) > 0:
+                        comment_button = wait.until(lambda driver:article.find_element_by_xpath(".//button[@data-control-name='comments_count']"))
                         action_comments = ActionChains(driver)
                         action_comments.move_to_element(comment_button).click().perform()
-                        time.sleep(2)
+                        time.sleep(5)
+
+                        if len(driver.find_elements_by_xpath(".//button[@data-control-name='more_comments']")) > 0:
+                            print("Yes..")
+                            comment_button = WebDriverWait(driver,5).until(lambda driver:driver.find_element_by_xpath(".//button[@data-control-name='more_comments']"))
+                            # print(comment_button)
+
+                            action_comments = ActionChains(driver)
+                            action_comments.move_to_element(comment_button).click(comment_button).perform()
+                            time.sleep(5)
+
                         comments_divs = article.find_elements_by_xpath(".//article")
                         print(comments_divs)
                         
@@ -570,7 +580,7 @@ def main():
     test_urls = list(profile_urls.values())
     test_names =list(profile_urls.keys())
     test_name = test_names[2]
-    test_url = test_urls[2]
+    test_url = test_urls[0]
     linkedin = Linkedin()
     linkedin.login()
     linkedin.gotoProfile(test_url)
