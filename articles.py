@@ -40,8 +40,8 @@ class Linkedin:
         # options.add_argument('user-data-dir=/home/dipes/.config/google-chrome/Profile')
         self.driver = webdriver.Chrome()
         self.driver.maximize_window()
-        self.email = 'pandey.dipesh50@gmail.com'
-        self.password = 'tatera2013'
+        self.email = ''
+        self.password = ''
 
 
     def login(self):
@@ -218,5 +218,22 @@ article = Linkedin()
 article.login()
 comments = article.getComments()
 shares = article.getShares()
-# article.quitDriver()
+article.quitDriver()
 
+
+ # with open('articles_comments.csv', 'w') as csvfile:
+ #    writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+ #    writer.writerow(['commenter', 'comment_url', 'comment_text'])
+ #    for i in comments:
+ #        for j in comments[i]:
+ #            writer.writerow([j['commenter'], j['commenter_url'], j['comment_text']])
+
+
+
+
+
+# with open('articles_shares.csv','w') as csvfile:
+#     writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+#     writer.writerow(['article_url', 'n_shares'])
+#     for i in shares:
+#          writer.writerow([i, shares[i]])

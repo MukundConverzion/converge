@@ -368,15 +368,14 @@ class Linkedin:
 
                             action_comments = ActionChains(driver)
                             action_comments.move_to_element(comment_button).click(comment_button).perform()
-                            time.sleep(5)
+                            time.sleep(3)
 
-                        comments_divs = article.find_elements_by_xpath(".//article")
+                        comments_divs = WebDriverWait(driver,5).until(lambda driver:article.find_elements_by_xpath(".//article"))
                         print(comments_divs)
                         
                         print(len(comments_divs))
             
-                        for div in comments_divs:
-                            time.sleep(3)    
+                        for div in comments_divs:    
                             commenter_url_element = div.find_element_by_xpath(".//div[2]/a[2]")
                             commenter_url = commenter_url_element.get_attribute("href")
                             commenter = commenter_url_element.text
@@ -395,6 +394,10 @@ class Linkedin:
 
                         article_i['comments'] = comments
                         print(comments)
+                    
+                    body = driver.find_element_by_css_selector('body')
+                    body.send_keys(Keys.PAGE_DOWN)
+                    time.sleep(3)
 
                     articles_list.append(article_i)
 
@@ -557,34 +560,33 @@ def writeToFile(objects):
         file.write(json.dumps(objects))
 
 
-def main():
-    profile_urls = {
-            'Leza Parker': 'https://www.linkedin.com/in/leza-parker/',
-            'Lim Hong Bin': 'https://www.linkedin.com/in/lim-hong-bin-0299542b/',
-            'Dean Reinhard': 'https://www.linkedin.com/in/deanreinhard/',
-            'James Nicol': 'https://www.linkedin.com/in/jamesnicol/',
-            'mingjie (mj) xu': 'https://www.linkedin.com/in/mingjiexu/',
-            'Lisa Luk': 'https://www.linkedin.com/in/lisaluk/',
-            'Shaurya Sinha': 'https://www.linkedin.com/in/shaurya157/',
-            'Zhang Xuan': 'https://www.linkedin.com/in/zhang-xuan-82533a129/',
-            'Jasmine Nicholls (nee Lee)': 'https://www.linkedin.com/in/jasmine-nicholls-nee-lee-aba68530/',
-            'Mukund Krishna Ravi': 'https://www.linkedin.com/in/mukundkrishnaravi/',
-            'Annette Tilbrook': 'https://www.linkedin.com/in/annettetilbrook/',
-            'Sean Straton': 'https://www.linkedin.com/in/sean-straton-31a46689/',
-            'Piyush Gupta': 'https://www.linkedin.com/in/piyushguptadbs/',
-            'Xavier Chia': 'https://www.linkedin.com/in/xavierchia/',
-            'Yijun Du': 'https://www.linkedin.com/in/yijun-du-857a43118/',
-            'Mahima Damani': 'https://www.linkedin.com/in/mahima-damani/',
-            }
-        # Try it with test_urls
-    test_urls = list(profile_urls.values())
-    test_names =list(profile_urls.keys())
-    test_name = test_names[2]
-    test_url = test_urls[0]
-    linkedin = Linkedin()
-    linkedin.login()
-    linkedin.gotoProfile(test_url)
-    posts = linkedin.getPosts()
+profile_urls = {
+        'Leza Parker': 'https://www.linkedin.com/in/leza-parker/',
+        'Lim Hong Bin': 'https://www.linkedin.com/in/lim-hong-bin-0299542b/',
+        'Dean Reinhard': 'https://www.linkedin.com/in/deanreinhard/',
+        'James Nicol': 'https://www.linkedin.com/in/jamesnicol/',
+        'mingjie (mj) xu': 'https://www.linkedin.com/in/mingjiexu/',
+        'Lisa Luk': 'https://www.linkedin.com/in/lisaluk/',
+        'Shaurya Sinha': 'https://www.linkedin.com/in/shaurya157/',
+        'Zhang Xuan': 'https://www.linkedin.com/in/zhang-xuan-82533a129/',
+        'Jasmine Nicholls (nee Lee)': 'https://www.linkedin.com/in/jasmine-nicholls-nee-lee-aba68530/',
+        'Mukund Krishna Ravi': 'https://www.linkedin.com/in/mukundkrishnaravi/',
+        'Annette Tilbrook': 'https://www.linkedin.com/in/annettetilbrook/',
+        'Sean Straton': 'https://www.linkedin.com/in/sean-straton-31a46689/',
+        'Piyush Gupta': 'https://www.linkedin.com/in/piyushguptadbs/',
+        'Xavier Chia': 'https://www.linkedin.com/in/xavierchia/',
+        'Yijun Du': 'https://www.linkedin.com/in/yijun-du-857a43118/',
+        'Mahima Damani': 'https://www.linkedin.com/in/mahima-damani/',
+        }
+    # Try it with test_urls
+test_urls = list(profile_urls.values())
+test_names =list(profile_urls.keys())
+test_name = test_names[2]
+test_url = test_urls[0]
+linkedin = Linkedin()
+linkedin.login()
+linkedin.gotoProfile(test_url)
+posts = linkedin.getPosts()
         #Extracting overview details using regex and create a dictionary to push into a pandas dataframe
         #regex = r"\n"
         #matches = re.finditer(regex,overview[0])
