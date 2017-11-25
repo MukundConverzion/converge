@@ -35,8 +35,8 @@ class Linkedin:
         # options.add_argument('user-data-dir=/home/dipes/.config/google-chrome/Profile')
         self.driver = webdriver.Chrome()
         self.driver.maximize_window()
-        self.email = ''
-        self.password = ''
+        self.email = 'pandey.dipesh50@gmail.com'
+        self.password = 'tatera2013'
 
 
 
@@ -184,23 +184,20 @@ class Linkedin:
         driver = self.driver
         # Scroll to bottom to load the page fully
         driver.get(driver.current_url+"detail/recent-activity/posts/")
-
         time.sleep(2)
 
         try:
-
             if len(driver.find_elements_by_class_name("no-content")) > 0:
                 print("No articles yet..")
             else:
                 print("Articles found ...")
                 # Scroll down once to get the articles
                 # Keep it it 5 scrolls for now
-                # self.scrollToN(5)
+                self.scrollToN(5)
                 articles = driver.find_elements_by_tag_name('article')
                 print (articles)
 
                 articles_list = []
-
                 for article in articles:
                     article_i = {}
                     if len(article.find_elements_by_class_name('pv-post-entity__title')) > 0:
@@ -213,79 +210,10 @@ class Linkedin:
                         print(timestamp)
                         article_i['time'] = timestamp
 
-                    a = article.find_element_by_tag_name("a")
-                    url = a.get_attribute('href')
-                    article_i['url']  = url
-                    print(url)
-
-                    actions = ActionChains(driver)
-                    actions.key_down(Keys.CONTROL).click(a).key_up(Keys.CONTROL).perform()
-                    time.sleep(3)
-                    driver.switch_to.window(driver.window_handles[-1])
-                    time.sleep(2)
-                    self.scrollToBottom()
-
-                    artpage = driver.find_element_by_tag_name('article')
-                    content = artpage.find_element_by_class_name('reader-article-content').text
-                    print(content)
-                    article_i['content'] = content
-
-                    time.sleep(3)
-                    # Extract likes
-                    try:
-                        if len(WebDriverWait(driver, 10).until(lambda driver:artpage.find_elements_by_class_name('feed-base-likes-list'))) > 0:
-                            like_section = WebDriverWait(driver, 10).until(lambda driver:artpage.find_element_by_class_name('feed-base-likes-list'))
-                            print(like_section)
-                            n_likes = like_section.find_element_by_tag_name('h3').text
-                            print(n_likes)
-                            article_i['likes'] = n_likes
-                        else:
-                            print("No likes yet..")
-
-                    except Exception as e:
-                        print(e)
-                            # Will work on the modal later, not working now
-
-                            # section_likes = article.find_element_by_xpath(".//section[@data-control-name='likes']")
-                            # print(" Likes for this article exist.")
-                            # # Look for more_button
-                            # if len(section_likes.find_elements_by_tag_name(".//button")) > 0:
-                            #     more_button = section_likes.find_element_by_tag_name(".//button").click()
-                            #     time.sleep(2)
-                            #     likes_modal = driver.find_element_by_tag_name('artdeco-modal-content')
-                            #     likes = likes_modal.find_elements_by_xpath(".//ul/li")
-                            #     for like in likes:
-                            #         print(like.text)
-                            # else:
-                            #     likes = section_likes.find_elements_by_xpath(".//ul/li")
-                            #     for like in likes:
-                            #         print(like.text)
-
-                    
-                    time.sleep(2)
-
-                        # Extract comments
-                    comments = []
-
-                    # To be worked in another iteration
-                    # if len(artpage.find_elements_by_xpath(".//button[@data-control-name='more_comments']")) > 0:
-                    #     comment_button = WebDriverWait(driver,10).until(lambda driver:artpage.find_element_by_xpath(".//button[@data-control-name='more_comments']"))
-                    #     action_comments = ActionChains(driver)
-                    #     action_comments.move_to_element(comment_button).click().perform()
-                    # time.sleep(4)
-
-                    # comments_divs = WebDriverWait(driver, 10).until(lambda driver:artpage.find_elements_by_xpath(".//article"))
-                    # print(comments_divs)
-                    
-                    # for comment in comments_divs:
-                    #     comments.append(comment.text)
-
-                    article_i['comments'] = comments
-                    print(comments)
+                    url = article.get_element_by_tag_name("a").get_attribute("href")
+                    article_i['url'] = url
+                        
                     articles_list.append(article_i)
-
-                    driver.close()
-                    driver.switch_to_window(driver.window_handles[0])
 
                 print(articles_list)
                 return (articles_list)
@@ -339,22 +267,61 @@ class Linkedin:
                         print(content)
                         article_i['content'] = content
 
-
-                     # Check for likes and comments
-                    if len(article.find_elements_by_xpath(".//button[@data-control-name='likes_count']")) > 0:
-                        n_likes = article.find_element_by_xpath(".//button[@data-control-name='likes_count']").text
-
-                        print(n_likes)
-                    else:
-                        n_likes = 0
-                    article_i['like'] = n_likes
-
-                    time.sleep(2)
-                    wait = WebDriverWait(driver, 6)
-
-                    comments = []
-                    # To be worked in the next iteration
                     
+                    ### Likes extraction 
+                    ###
+                    likes = []
+                    if len(article.find_elements_by_xpath(".//button[@data-control-name='likes_count']")) > 0:
+                        likes_element = article.find_element_by_xpath(".//button[@data-control-name='likes_count']")
+                        # n_likes = likes_element.text
+                        action_likes =ActionChains(driver)
+                        action_likes.move_to_element(likes_element).click(likes_element).perform()
+                        time.sleep(3)
+
+                        try:
+                            modal_element = WebDriverWait(driver, 10).until(
+                                                                        EC.presence_of_element_located((By.ID, "artdeco-modal-outlet")))
+                            # Scroll to bottom
+                            last_height = driver.execute_script("return arguments[0].scrollHeight", modal_element.find_element_by_tag_name("ul"))
+                            while True:
+                                # Scroll down to bottom
+                                scrollHelght = driver.execute_script("arguments[0].scrollTop = " + str(last_height), modal_element.find_element_by_tag_name("ul"))
+                                time.sleep(1.5)
+                                # Calculate new scroll height and compare with last scroll height
+                                new_height = driver.execute_script("return arguments[0].scrollHeight", modal_element.find_element_by_tag_name("ul"))
+                                if new_height == last_height:
+                                    break
+                                    print("Reached the end of list ...")
+                                last_height = new_height
+                                print("Scrolling down ...")
+                            modal_content = modal_element.find_element_by_tag_name("ul")
+                            actor_elements = modal_element.find_elements_by_tag_name("li")
+                            # Taking too long for large no. of likes
+                            for actor_element in actor_elements:
+                                actor_element = actor_element.find_element_by_tag_name("a")
+                                url = actor_element.get_attribute('href')
+                                name = actor_element.find_element_by_class_name("name").text
+                                headline = actor_element.find_element_by_class_name("headline").text
+                                likes.append({'url':url, 'name': name, 'headline':headline})
+                            print("All likes extracted..\n")
+                            article_i['likes'] = likes
+                            close_button = driver.find_element_by_class_name('artdeco-dismiss')
+                            action_close = ActionChains(driver)
+                            action_close.move_to_element(close_button).click(close_button).perform()
+                            time.sleep(1.5)
+                            print("{} likes found..".format(str(len(likes))))     
+                        except Exception as e:
+                            print(e)
+
+                    else:
+                        article_i['likes'] = likes                 
+                    time.sleep(2)
+
+                    
+                    ### Comments extraction
+                    ###
+                    wait = WebDriverWait(driver, 6)
+                    comments = []
                     if len(article.find_elements_by_xpath(".//button[@data-control-name='comments_count']")) > 0:
                         comment_button = wait.until(lambda driver:article.find_element_by_xpath(".//button[@data-control-name='comments_count']"))
                         action_comments = ActionChains(driver)
@@ -401,9 +368,9 @@ class Linkedin:
 
                     articles_list.append(article_i)
 
-                print(articles_list)
+                print("Data extracted for {} posts...".format(str(len(articles_list))))
+                # print(articles_list)
                 return(articles_list)
-
 
 
         except Exception as e:

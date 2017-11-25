@@ -26,13 +26,13 @@ urls = ['https://www.linkedin.com/pulse/rise-india-one-big-stories-asia-next-20-
         ]
 
 
-class Linkedin:
+class LinkedInArticle:
     '''
     Initialize necessary variables
     This one works for the non-public profiles
     Requires login
     '''
-    def __init__(self, ):
+    def __init__(self, url):
         # options = webdriver.ChromeOptions()
         # Replace the dir with the profile of your google chrome
         # To do this, goto google-chrome, and type: chrome://version, and get the profile path
@@ -40,8 +40,9 @@ class Linkedin:
         # options.add_argument('user-data-dir=/home/dipes/.config/google-chrome/Profile')
         self.driver = webdriver.Chrome()
         self.driver.maximize_window()
-        self.email = ''
-        self.password = ''
+        self.email = 'pandey.dipesh50@gmail.com'
+        self.password = 'tatera2013'
+        self.url = url
 
 
     def login(self):
@@ -84,67 +85,66 @@ class Linkedin:
                 break
             last_height = new_height
 
+
+    def getContent(self):
+        driver = self.driver
+
+        driver.get(self.url)
+        driver = self.driver
+        content = driver.find_element_by_class_name('reader-article-content').text
+        print(content)
+        return content
+
     
     def getComments(self):
         driver = self.driver
         
-        comments_all = {}
-        for i in urls:
+        time.sleep(3)
 
-            driver.get(i)
-            time.sleep(4)
-
-            body = driver.find_element_by_tag_name('body')
-            comments = []
-            while True:
-                print("Scrolling..")
+        body = driver.find_element_by_tag_name('body')
+        comments = []
+        while True:
+            print("Scrolling..")
+            body.send_keys(Keys.PAGE_DOWN)
+            time.sleep(2)
+            if len(driver.find_elements_by_xpath(".//button[@data-control-name='more_comments']")) > 0:
+                print("Yes..")
+                comment_button = WebDriverWait(driver,5).until(lambda driver:driver.find_element_by_xpath(".//button[@data-control-name='more_comments']"))
+                # print(comment_button)
+                action_comments = ActionChains(driver)
+                action_comments.move_to_element(comment_button).click(comment_button).perform()
+                time.sleep(5)
                 body.send_keys(Keys.PAGE_DOWN)
-                time.sleep(2)
-                if len(driver.find_elements_by_xpath(".//button[@data-control-name='more_comments']")) > 0:
-                    print("Yes..")
-                    comment_button = WebDriverWait(driver,5).until(lambda driver:driver.find_element_by_xpath(".//button[@data-control-name='more_comments']"))
-                    # print(comment_button)
+                break
 
-                    action_comments = ActionChains(driver)
-                    action_comments.move_to_element(comment_button).click(comment_button).perform()
-                    time.sleep(5)
-                    body.send_keys(Keys.PAGE_DOWN)
-                    break
-
-            self.scrollToBottom()
-            comments_div = driver.find_element_by_class_name("feed-base-comments-list")
-            # print(comments_div.text)
-            comments_divs = comments_div.find_elements_by_xpath(".//article")
-            print(len(comments_divs))
-            driver.implicitly_wait(10)
-            for div in comments_divs:
-                if len(div.find_elements_by_xpath(".//p[@dir='ltr']")) > 0:
-                    comment_element = div.find_element_by_xpath(".//p[@dir='ltr']")
-                    comment_text = comment_element.text
-                    print(comment_text)
-                    commenter_url_element = div.find_element_by_xpath(".//a[@data-control-name='comment_actor']")
-                    commenter_url = commenter_url_element.get_attribute("href")
-                    commenter = commenter_url_element.text
-                    
-                i_comment = {'commenter': commenter, 'commenter_url': commenter_url, 'comment_text': comment_text}
-                comments.append(i_comment)
-
-
-            comments_all[i] = comments
+        comments_div = driver.find_element_by_class_name("feed-base-comments-list")
+        # print(comments_div.text)
+        comments_divs = comments_div.find_elements_by_xpath(".//article")
+        print(len(comments_divs))
+        time.sleep(3)
+        for div in comments_divs:
+            if len(div.find_elements_by_xpath(".//p[@dir='ltr']")) > 0:
+                comment_element = div.find_element_by_xpath(".//p[@dir='ltr']")
+                comment_text = comment_element.text
+                print(comment_text)
+                commenter_url_element = div.find_element_by_xpath(".//a[@data-control-name='comment_actor']")
+                commenter_url = commenter_url_element.get_attribute("href")
+                commenter = commenter_url_element.text
+                
+            i_comment = {'commenter': commenter, 'commenter_url': commenter_url, 'comment_text': comment_text}
+            comments.append(i_comment)
 
         print("\n")
         print(len(comments))
-        return comments_all
-    
+        return comments
+
 
 
     def getLikes(self):
         driver = self.driver
         
         # for i in urls:
-        driver.get(urls[3])
-        driver.implicitly_wait(8)
-        time.sleep(4)
+        time.sleep(3)
 
         body = driver.find_element_by_tag_name('body')
         comments = []
@@ -182,13 +182,19 @@ class Linkedin:
                 print("Scrolling down ...")
             modal_content = modal_element.find_element_by_tag_name("ul")
             actor_elements = modal_element.find_elements_by_tag_name("li")
+            # Taking too long for large no. of likes
             for actor_element in actor_elements:
                 actor_element = actor_element.find_element_by_tag_name("a")
                 url = actor_element.get_attribute('href')
                 name = actor_element.find_element_by_class_name("name").text
                 headline = actor_element.find_element_by_class_name("headline").text
                 likes.append({'url':url, 'name': name, 'headline':headline})
-
+            print("All likes extracted..\n")
+            close_button = driver.find_element_by_class_name('artdeco-dismiss')
+            action_close = ActionChains(driver)
+            action_close.move_to_element(close_button).click(close_button).perform()
+            time.sleep(1.5)
+            
             print(likes)
 
 
@@ -204,19 +210,14 @@ class Linkedin:
     def getShares(self):
         driver = self.driver
 
-        all_shares = {}
-        for i in urls:
-            driver.get(i)
-            time.sleep(5)
-            try:
-                shares = driver.find_element_by_xpath("//ul[@class='reader-social-bar__items']/li[2]/span").text
-            except Exception as e:
-                print(e)
-            else:
-                all_shares[i] = shares
-
-        print(all_shares)
-        return all_shares
+        try:
+            shares = driver.find_element_by_xpath("//ul[@class='reader-social-bar__items']/li[2]/span").text
+        except Exception as e:
+            print(e)
+            return 'No shares found ...'
+        else:            
+            print(shares)
+            return shares
 
 
 
@@ -225,9 +226,16 @@ class Linkedin:
         driver.quit()
 
 
-article = Linkedin()
+article = LinkedInArticle(url=url[2])
 article.login()
-likes = article.getLikes()
+article.getContent()
+article.getLikes()
+article.getShares()
+article.getComments()
+
+
+
+
 
 
  # with open('articles_comments.csv', 'w') as csvfile:
