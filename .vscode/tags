@@ -24,8 +24,9 @@ WebDriverWait	../Linkedin.py	/^from selenium.webdriver.support.ui import WebDriv
 WebDriverWait	../articles.py	/^from selenium.webdriver.support.ui import WebDriverWait$/;"	kind:namespace	line:10
 __init__	../Linkedin.py	/^    def __init__(self, ):$/;"	kind:member	line:30
 __init__	../articles.py	/^    def __init__(self, ):$/;"	kind:member	line:35
-article	../articles.py	/^article = Linkedin()$/;"	kind:variable	line:139
+article	../articles.py	/^article = Linkedin()$/;"	kind:variable	line:217
 articles.py	../articles.py	1;"	kind:file	line:1
+comments	../articles.py	/^comments = article.getComments()$/;"	kind:variable	line:219
 csv	../Linkedin.py	/^import csv$/;"	kind:namespace	line:4
 csv	../articles.py	/^import csv$/;"	kind:namespace	line:4
 expected_conditions	../Linkedin.py	/^from selenium.webdriver.support import expected_conditions$/;"	kind:namespace	line:15
@@ -34,31 +35,40 @@ getActivities	../Linkedin.py	/^    def getActivities(self, url):$/;"	kind:member
 getArticles	../Linkedin.py	/^    def getArticles(self):$/;"	kind:member	line:183
 getComments	../articles.py	/^    def getComments(self):$/;"	kind:member	line:88
 getConnections	../Linkedin.py	/^    def getConnections(self):$/;"	kind:member	line:76
-getEducation	../Linkedin.py	/^    def getEducation(self):$/;"	kind:member	line:467
-getExperience	../Linkedin.py	/^    def getExperience(self):$/;"	kind:member	line:414
+getEducation	../Linkedin.py	/^    def getEducation(self):$/;"	kind:member	line:497
+getExperience	../Linkedin.py	/^    def getExperience(self):$/;"	kind:member	line:444
+getLikes	../articles.py	/^    def getLikes(self):$/;"	kind:member	line:141
 getOverview	../Linkedin.py	/^    def getOverview(self):$/;"	kind:member	line:148
 getPosts	../Linkedin.py	/^    def getPosts(self):$/;"	kind:member	line:310
-getSkills	../Linkedin.py	/^    def getSkills(self):$/;"	kind:member	line:431
-getSummary	../Linkedin.py	/^    def getSummary(self):$/;"	kind:member	line:387
+getShares	../articles.py	/^    def getShares(self):$/;"	kind:member	line:193
+getSkills	../Linkedin.py	/^    def getSkills(self):$/;"	kind:member	line:461
+getSummary	../Linkedin.py	/^    def getSummary(self):$/;"	kind:member	line:417
 gotoProfile	../Linkedin.py	/^    def gotoProfile(self, url):$/;"	kind:member	line:66
 json	../Linkedin.py	/^import json$/;"	kind:namespace	line:5
 json	../articles.py	/^import json$/;"	kind:namespace	line:5
+linkedin	../Linkedin.py	/^linkedin = Linkedin()$/;"	kind:variable	line:586
 login	../Linkedin.py	/^    def login(self):$/;"	kind:member	line:43
 login	../articles.py	/^    def login(self):$/;"	kind:member	line:47
-main	../Linkedin.py	/^def main():$/;"	kind:function	line:533
 os	../Linkedin.py	/^import os$/;"	kind:namespace	line:3
 os	../articles.py	/^import os$/;"	kind:namespace	line:3
-quitBrowser	../Linkedin.py	/^    def quitBrowser(self):$/;"	kind:member	line:522
-quitDriver	../articles.py	/^    def quitDriver(self):$/;"	kind:member	line:134
+posts	../Linkedin.py	/^posts = linkedin.getPosts()$/;"	kind:variable	line:589
+profile_urls	../Linkedin.py	/^profile_urls = {$/;"	kind:variable	line:563
+quitBrowser	../Linkedin.py	/^    def quitBrowser(self):$/;"	kind:member	line:552
+quitDriver	../articles.py	/^    def quitDriver(self):$/;"	kind:member	line:212
 re	../Linkedin.py	/^import re$/;"	kind:namespace	line:18
 re	../articles.py	/^import re$/;"	kind:namespace	line:17
 requests	../Linkedin.py	/^import requests$/;"	kind:namespace	line:2
 requests	../articles.py	/^import requests$/;"	kind:namespace	line:2
-scrollToBottom	../Linkedin.py	/^    def scrollToBottom(self):$/;"	kind:member	line:501
+scrollToBottom	../Linkedin.py	/^    def scrollToBottom(self):$/;"	kind:member	line:531
 scrollToBottom	../articles.py	/^    def scrollToBottom(self):$/;"	kind:member	line:68
-scrollToN	../Linkedin.py	/^    def scrollToN(self, n_scrolls):$/;"	kind:member	line:480
+scrollToN	../Linkedin.py	/^    def scrollToN(self, n_scrolls):$/;"	kind:member	line:510
+shares	../articles.py	/^shares = article.getShares()$/;"	kind:variable	line:220
 sys	../Linkedin.py	/^import sys$/;"	kind:namespace	line:20
 sys	../articles.py	/^import sys$/;"	kind:namespace	line:19
+test_name	../Linkedin.py	/^test_name = test_names[2]$/;"	kind:variable	line:584
+test_names	../Linkedin.py	/^test_names =list(profile_urls.keys())$/;"	kind:variable	line:583
+test_url	../Linkedin.py	/^test_url = test_urls[0]$/;"	kind:variable	line:585
+test_urls	../Linkedin.py	/^test_urls = list(profile_urls.values())$/;"	kind:variable	line:582
 time	../Linkedin.py	/^import time$/;"	kind:namespace	line:1
 time	../articles.py	/^import time$/;"	kind:namespace	line:1
 traceback	../Linkedin.py	/^import traceback$/;"	kind:namespace	line:19
@@ -66,4 +76,4 @@ traceback	../articles.py	/^import traceback$/;"	kind:namespace	line:18
 urls	../articles.py	/^urls = ['https:\/\/www.linkedin.com\/pulse\/rise-india-one-big-stories-asia-next-20-years-piyush-gupta\/',$/;"	kind:variable	line:21
 webdriver	../Linkedin.py	/^from selenium import webdriver$/;"	kind:namespace	line:9
 webdriver	../articles.py	/^from selenium import webdriver$/;"	kind:namespace	line:8
-writeToFile	../Linkedin.py	/^def writeToFile(objects):$/;"	kind:function	line:528
+writeToFile	../Linkedin.py	/^def writeToFile(objects):$/;"	kind:function	line:558

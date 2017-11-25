@@ -40,8 +40,8 @@ class Linkedin:
         # options.add_argument('user-data-dir=/home/dipes/.config/google-chrome/Profile')
         self.driver = webdriver.Chrome()
         self.driver.maximize_window()
-        self.email = ''
-        self.password = ''
+        self.email = 'pandey.dipesh50@gmail.com'
+        self.password = 'tatera2013'
 
 
     def login(self):
@@ -148,46 +148,57 @@ class Linkedin:
 
         body = driver.find_element_by_tag_name('body')
         comments = []
+        
         while True:
             print("Scrolling..")
             body.send_keys(Keys.PAGE_DOWN)
             time.sleep(2)
-            if len(driver.find_elements_by_xpath(".//button[@data-control-name='likes']")) > 0:
+            if len(driver.find_elements_by_xpath("//button[@data-control-name='likes']")) > 0:
                 print("Yes..")
+                likes_element = driver.find_element_by_xpath("//button[@data-control-name='likes']")
+                action_likes = ActionChains(driver)
+                action_likes.move_to_element(likes_element).click(likes_element).perform()
+                time.sleep(1.5)
                 break
 
-        time.sleep(3)
-        driver.find_element_by_xpath(".//button[@data-control-name='likes']").click()
-
-        # iframe = driver.find_elements_by_tag_name('iframe')[0]
-        # driver.switch_to_frame(iframe)
-        # likers = []
-        # time.sleep(3)
-        # while True:
-        #     try:
-        #         print(driver.window_handles)
-        #         actor_elements = driver.find_elements_by_xpath("//ul[@class='actor-list']/li")
-        #         print("abc",actor_elements)
-
-        #         print([i.text for i in actor_elements])
-        #         break
-        #     except Exception as e:
-        #         print(e)
-
+        # Wait until the modal is opened
         try:
-            time.sleep(5)
-            alert = driver.switch_to_alert()
-            alert.accept()
-            print("alert accepted")
-            actor_elements = driver.find_elements_by_xpath("//ul[@class='actor-list']/li")
-            print("abc",actor_elements)
+            modal_element = WebDriverWait(driver, 10).until(
+                                                        EC.presence_of_element_located((By.ID, "artdeco-modal-outlet")))
 
-            print([i.text for i in actor_elements])
+            likes = []
+            # Scroll to bottom
+            last_height = driver.execute_script("return arguments[0].scrollHeight", modal_element.find_element_by_tag_name("ul"))
+            while True:
+                # Scroll down to bottom
+                scrollHelght = driver.execute_script("arguments[0].scrollTop = " + str(last_height), modal_element.find_element_by_tag_name("ul"))
+                time.sleep(1.5)
+                # Calculate new scroll height and compare with last scroll height
+                new_height = driver.execute_script("return arguments[0].scrollHeight", modal_element.find_element_by_tag_name("ul"))
+                if new_height == last_height:
+                    break
+                    print("Reached the end of list ...")
+                last_height = new_height
+                print("Scrolling down ...")
+            modal_content = modal_element.find_element_by_tag_name("ul")
+            actor_elements = modal_element.find_elements_by_tag_name("li")
+            for actor_element in actor_elements:
+                actor_element = actor_element.find_element_by_tag_name("a")
+                url = actor_element.get_attribute('href')
+                name = actor_element.find_element_by_class_name("name").text
+                headline = actor_element.find_element_by_class_name("headline").text
+                likes.append({'url':url, 'name': name, 'headline':headline})
+
+            print(likes)
+
 
         except Exception as e:
             print(e)
+            return []
+
+        else:
+            return likes
             
-        driver.switch_to_default_content()
 
 
     def getShares(self):
@@ -216,9 +227,7 @@ class Linkedin:
 
 article = Linkedin()
 article.login()
-comments = article.getComments()
-shares = article.getShares()
-article.quitDriver()
+likes = article.getLikes()
 
 
  # with open('articles_comments.csv', 'w') as csvfile:
